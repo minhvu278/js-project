@@ -1,6 +1,7 @@
 const canvas = document.querySelector("canvas"),
     toolBtns = document.querySelectorAll(".tool")
     fillColor = document.querySelector("#fill-color")
+    sizeSlider = document.querySelector("#size-slider")
     ctx = canvas.getContext("2d");
 
 // Global variable with default value
@@ -22,6 +23,27 @@ const drawRect = (e) => {
     ctx.fillRect(e.offsetX, e.offsetY, prevMouseX - e.offsetX, preMouseY - e.offsetY)
 }
 
+const drawCircle = (e) => {
+    ctx.beginPath();
+
+    //Getting radius for circle according to the mouse point
+    let radius = Math.sqrt(Math.pow((prevMouseX - e.offsetX), 2) + Math.pow((preMouseY - e.offsetY), 2))
+    //creating circle according to the mouse point
+    ctx.arc(prevMouseX, preMouseY, radius, 0, 2 * Math.PI)
+    // if fillColor is checked fill circle else draw border circle
+    fillColor.checked ? ctx.fill() : ctx.stroke();
+    ctx.stroke();
+}
+
+const drawTriangle = (e) => {
+    ctx.beginPath();
+    ctx.moveTo(prevMouseX, preMouseY)
+    ctx.lineTo(e.offsetX, e.offsetY)
+    ctx.lineTo(prevMouseX * 2 - e.offsetX, e.offsetY)
+    ctx.closePath();
+    fillColor.checked ? ctx.fill() : ctx.stroke();
+}
+
 const startDraw = (e) => {
     isDrawing = true;
     prevMouseX = e.offsetX; // Passing current mouseX position as prevMouseX value
@@ -41,6 +63,10 @@ const drawing = (e) => {
         ctx.stroke(); // Drawing/filing line with color
     } else if (selectedTool === "rectangle") {
         drawRect(e)
+    } else if (selectedTool === "circle") {
+        drawCircle(e)
+    } else {
+        drawTriangle(e)
     }
 }
 
@@ -53,6 +79,8 @@ toolBtns.forEach(btn => {
         console.log(selectedTool)
     })
 })
+
+sizeSlider.addEventListener("change", () => brushWidth = sizeSlider.value)
 
 canvas.addEventListener("mousedown", startDraw)
 canvas.addEventListener("mousemove", drawing)
