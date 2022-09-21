@@ -1,14 +1,25 @@
 const canvas = document.querySelector("canvas"),
     toolBtns = document.querySelectorAll(".tool")
-    fillColor = document.querySelector("#fill-color")
-    sizeSlider = document.querySelector("#size-slider")
-    ctx = canvas.getContext("2d");
+fillColor = document.querySelector("#fill-color")
+sizeSlider = document.querySelector("#size-slider")
+colorBtns = document.querySelectorAll(".colors .option")
+colorPicker = document.querySelector("#color-picker")
+clearCanvas = document.querySelector(".clear-canvas")
+saveImage = document.querySelector(".save-img")
+ctx = canvas.getContext("2d");
 
 // Global variable with default value
 let prevMouseX, preMouseY, snapshot
 let isDrawing = false
 selectedTool = "brush"
-    brushWidth = 5;
+brushWidth = 5;
+selectedColor = '#000'
+
+const setCanvasBackground = () => {
+    ctx.fillStyle = '#fff'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.fillStyle = selectedColor
+}
 
 window.addEventListener("load", () => {
     //Setting canvas width/height ... offsetwith/height return viewable with/height of an element
@@ -50,6 +61,8 @@ const startDraw = (e) => {
     preMouseY = e.offsetY;
     ctx.beginPath(); //Creating new path to draw
     ctx.lineWidth = brushWidth; // passing brush size as line width
+    ctx.strokeStyle = selectedColor;
+    ctx.fillStyle = selectedColor
     // copying canvas data & passing as snapshot value ... this avoids dragging the image
     snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
@@ -58,7 +71,8 @@ const drawing = (e) => {
     if (!isDrawing) return // if isDrawing is false return from here
     ctx.putImageData(snapshot, 0, 0) // adding copied canvas data on to this canvas
 
-    if (selectedTool === "brush") {
+    if (selectedTool === "brush" || selectedTool === "eraser") {
+        ctx.strokeStyle = selectedTool === "eraser" ? "#fff" : selectedColor
         ctx.lineTo(e.offsetX, e.offsetY); // Creating line according to the mouse point
         ctx.stroke(); // Drawing/filing line with color
     } else if (selectedTool === "rectangle") {
@@ -81,6 +95,31 @@ toolBtns.forEach(btn => {
 })
 
 sizeSlider.addEventListener("change", () => brushWidth = sizeSlider.value)
+
+colorBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelector(".options .selected").classList.remove("selected")
+        btn.classList.add("selected")
+        selectedColor = window.getComputedStyle(btn).getPropertyValue("background-color")
+    })
+})
+
+colorPicker.addEventListener("change", () => {
+    colorPicker.parentElement.style.background = colorPicker.value;
+    colorPicker.parentElement.click()
+})
+
+clearCanvas.addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    setCanvasBackground()
+})
+
+saveImage.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = `${Date.now()}.jpg`;
+    link.href = canvas.toDataURL();
+    link.click();
+})
 
 canvas.addEventListener("mousedown", startDraw)
 canvas.addEventListener("mousemove", drawing)
