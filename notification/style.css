@@ -1,0 +1,27 @@
+.container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial;
+    text-align: center;
+}
+
+.container .fa-brands {
+    color: blue;
+    font-size: 80px;
+}
+
+.container .notify::before {
+    position: absolute;
+    /*content: attr(data-count);*/
+    content: '1';
+    top: 0;
+    right: -3px;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    padding: 5px 12px;
+    background: linear-gradient(#ff1a1a, #ff0000, #e60000);
+    border-radius: 50px;
+}
